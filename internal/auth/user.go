@@ -20,7 +20,7 @@ func Signup(ctx *gin.Context) {
 	user.Role = "user"
 
 	// create JWT
-	token, err := CreateToken(user.Name, user.Email, user.Role)
+	token, err := GenerateJWT(user.ID.String(), user.Name, user.Email, user.Role)
 	if err != nil {
 		ctx.String(http.StatusInternalServerError, "Token error")
 		return
@@ -34,6 +34,7 @@ func Signup(ctx *gin.Context) {
 
 // temp user
 var demoUser = models.User{
+	ID:       uuid.New(),
 	Name:     "Priyanshu Alawa",
 	Email:    "alawa@admin.com",
 	Password: "1234",
@@ -55,7 +56,7 @@ func Login(ctx *gin.Context) {
 	}
 
 	// create jwt token
-	token, err := CreateToken(demoUser.Name, demoUser.Email, demoUser.Role)
+	token, err := GenerateJWT(demoUser.ID.String(), demoUser.Name, demoUser.Email, demoUser.Role)
 
 	if err != nil {
 		ctx.String(http.StatusInternalServerError, "could not create token")
