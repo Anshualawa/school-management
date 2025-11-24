@@ -1,27 +1,35 @@
 package auth
 
 import (
+	"errors"
+	"os"
+	"strings"
 	"time"
 
+	"github.com/Anshualawa/school-management/internal/utils"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtKey = []byte("mySuperKey")
+var jwtKey = []byte(os.Getenv("JWT_SECRET"))
 
 type Claims struct {
-	Name  string `json:"name"`
-	Email string `json:"email"`
-	Role  string `json:"role"`
+	UserID string `json:"user_id"`
+	Name   string `json:"name"`
+	Email  string `json:"email"`
+	Role   string `json:"role"`
 	jwt.RegisteredClaims
 }
 
-func CreateToken(name, email, role string) (string, error) {
+func GenerateJWT(userID, name, email, role string) (string, error) {
 	claims := &Claims{
-		Name:  name,
-		Email: email,
-		Role:  role,
+		UserID: userID,
+		Name:   name,
+		Email:  email,
+		Role:   role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(2 * time.Hour)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			Issuer:    "school_management",
 		},
 	}
 
@@ -30,10 +38,16 @@ func CreateToken(name, email, role string) (string, error) {
 	return token.SignedString(jwtKey)
 }
 
-func ParseToken(tokenString string) (*Claims, error) {
+func ValidateJWT(tokenStr string) (*Claims, error) {
+	tokenStr = strings.TrimSpace(tokenStr)
+
+	if utils.IsEmpty(tokenStr) {
+		return nil, errors.New("empty token")
+	}
+
 	claims := &Claims{}
 
-	token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (any, error) {
+	token, err := jwt.ParseWithClaims(tokenStr, claims, func(t *jwt.Token) (any, error) {
 		return jwtKey, nil
 	})
 

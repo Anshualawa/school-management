@@ -1,13 +1,32 @@
 package main
 
 import (
+	"fmt"
 	"log"
-	"net/http"
 
-	"github.com/Anshualawa/school-management/internal/auth"
-	"github.com/gin-gonic/gin"
+	"github.com/Anshualawa/school-management/internal/app"
+	"github.com/Anshualawa/school-management/internal/config"
+	"github.com/Anshualawa/school-management/internal/database"
 )
 
+func main() {
+	cfg := config.Load()
+
+	db, err := database.Connect(cfg)
+	if err != nil {
+		log.Fatalf("failed to connect database:%v", err)
+	}
+	defer database.CloseDB(db)
+
+	server := app.NewServer(cfg, db)
+	addr := fmt.Sprintf(":%s", cfg.AppPort)
+
+	if err := server.Start(addr); err != nil {
+		log.Fatal(err)
+	}
+}
+
+/*
 var books = []string{"Hindi", "English", "Social Science", "Science", "Mathematics"}
 
 func main() {
@@ -49,3 +68,4 @@ func main() {
 
 	log.Fatal(g.Run(":8080"))
 }
+*/
