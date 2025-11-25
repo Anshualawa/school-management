@@ -30,6 +30,9 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	userSvc := services.NewUserService(userRepo)
 	authH := handlers.NewAuthorHandler(userSvc)
 
+	
 	r.POST("/api/v1/signup", authH.Signup)
 	r.POST("/api/v1/login", authH.Login)
+
+
 }

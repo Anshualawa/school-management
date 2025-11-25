@@ -21,6 +21,17 @@ func Connect(cfg *config.Config) (*gorm.DB, error) {
 
 	err = db.AutoMigrate(
 		&models.User{},
+		&models.Student{},
+		&models.Teacher{},
+		&models.Class{},
+		&models.Subject{},
+		&models.ClassSubject{},
+		&models.Attendance{},
+		&models.Exam{},
+		&models.Marks{},
+		&models.Book{},
+		&models.Fee{},
+		&models.FeePayment{},
 	)
 
 	if err != nil {
